@@ -1,5 +1,6 @@
 var fs = require('fs'),
-    walk = require('fs-walker');
+    walk = require('fs-walker'),
+    baseDir;
 
 /**
  * Removes filename from full filename leaving base dir only
@@ -7,9 +8,11 @@ var fs = require('fs'),
  * @param {string} str
  * @returns {string}
  */
-var baseDir = module.exports.baseDir = function (str) {
+module.exports.baseDir = function (str) {
     return str.replace(/[\/\\][^\/\\]*$/i, '');
 }
+
+baseDir = module.exports.baseDir;
 
 /**
  * Finds all javascripts inside folder and inserts into result. Converts directory structure to object structure
@@ -27,9 +30,9 @@ var baseDir = module.exports.baseDir = function (str) {
  * ```
  *
  * @param {string|Object} moduleInfoOrDir - module information or directory where search files
- * @param {Object=} res - result where to store found modules, uses moduleInfoOrDir.exports if
+ * @param {Object=} res - result where to store found modules, uses moduleInfoOrDir.exports if not defined
  * @param {Object=} filter - see [fs-walker filter](https://github.com/steventhuriot/node-fs-walker#filters) for details.
- *                         default behaviour is to add *.js files ignoring files placed in `node_modules`, `test`
+ *                         Default behaviour is to add all `*.js` files, ignoring files placed in `node_modules`, `test`
  *                         and dot-started directories
  * @returns {Object} object passed as an argument or new object populated with all modules inside baseDir
  */
@@ -76,14 +79,15 @@ module.exports.make = function (moduleInfoOrDir, res, filter) {
     walk.files
         .sync(directory, filter)
         .forEach(function(stats) {
-            var requiredModule = require(stats.fullname),
+            var i, part,
+                requiredModule = require(stats.fullname),
                 shortName = stats.fullname. substr(directory.length + 1),
                 parts = shortName.replace(/\.js$/i, '').split(/[\/\\]/),
                 currentTreePos = res;
 
             // create path and store required module
-            for (var i = 0; i < parts.length; i++) {
-                var part = parts[i];
+            for (i = 0; i < parts.length; i++) {
+                part = parts[i];
                 if (i === parts.length - 1 ) {
                     currentTreePos[part] = requiredModule;
                 } else {

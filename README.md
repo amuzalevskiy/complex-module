@@ -1,28 +1,41 @@
-## Members
-<dl>
-<dt><a href="#baseDir">baseDir</a> ⇒ <code>string</code></dt>
-<dd><p>Removes filename from full filename leaving base dir only</p>
-</dd>
-</dl>
-## Functions
-<dl>
-<dt><a href="#make">make(moduleInfoOrDir, [res], [filter])</a> ⇒ <code>Object</code></dt>
-<dd><p>Finds all javascripts inside folder and inserts into result. Converts directory structure to object structure</p>
-<p>Usual use case:</p>
-<pre><code class="lang-javascript">// will populate all modules in current directory to module.exports object
-require(&#39;complex-module&#39;).make(module);
-</code></pre>
-<p>If your library is in subfolder:</p>
-<pre><code class="lang-javascript">var complexModule = require(&#39;complex-module&#39;);
-complexModule.make(complexModule.baseDir(module.filename) + &#39;/lib&#39;, module.exports);
-</code></pre>
-</dd>
-</dl>
+# complex-module
+
+Simple tool for creating complex modules. Converts directory structure to object.
+
+### Sample:
+Directory structure
+```sh
+tools/
+    usefullTool.js
+exportedClass.js
+```
+will be converted to
+```js
+module.exports = {
+    tools: {
+        usefullTool: require('./tools/usefullTool.js'),
+    },
+    exportedClass: require('./exportedClass.js')
+}
+```
+
+Using following script (e.g. `index.js`):
+```javascript
+// will populate all modules in current directory to module.exports object
+require('complex-module').make(module);
+```
+
+Or if your library is placed in sub-folder:
+```javascript
+var complexModule = require('complex-module');
+complexModule.make(complexModule.baseDir(module.filename) + '/lib', module.exports);
+```
+
 <a name="baseDir"></a>
-## baseDir ⇒ <code>string</code>
+## baseDir(str) ⇒ <code>string</code>
 Removes filename from full filename leaving base dir only
 
-**Kind**: global variable  
+**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -50,6 +63,6 @@ complexModule.make(complexModule.baseDir(module.filename) + '/lib', module.expor
 | Param | Type | Description |
 | --- | --- | --- |
 | moduleInfoOrDir | <code>string</code> &#124; <code>Object</code> | module information or directory where search files |
-| [res] | <code>Object</code> | result where to store found modules, uses moduleInfoOrDir.exports if |
-| [filter] | <code>Object</code> | see [fs-walker filter](https://github.com/steventhuriot/node-fs-walker#filters) for details.                         default behaviour is to add *.js files ignoring files placed in `node_modules`, `test`                         and dot-started directories |
+| [res] | <code>Object</code> | result where to store found modules, uses moduleInfoOrDir.exports if not defined |
+| [filter] | <code>Object</code> | see [fs-walker filter](https://github.com/steventhuriot/node-fs-walker#filters) for details.                         Default behaviour is to add all `*.js` files, ignoring files placed in `node_modules`, `test`                         and dot-started directories |
 

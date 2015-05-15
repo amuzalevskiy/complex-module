@@ -1,0 +1,34 @@
+# complex-module
+
+Simple tool for creating complex modules. Converts directory structure to object.
+
+### Sample:
+Directory structure
+```sh
+tools/
+    usefullTool.js
+exportedClass.js
+```
+will be converted to
+```js
+module.exports = {
+    tools: {
+        usefullTool: require('./tools/usefullTool.js'),
+    },
+    exportedClass: require('./exportedClass.js')
+}
+```
+
+Using following script (e.g. `index.js`):
+```javascript
+// will populate all modules in current directory to module.exports object
+require('complex-module').make(module);
+```
+
+Or if your library is placed in sub-folder:
+```javascript
+var complexModule = require('complex-module');
+complexModule.make(complexModule.baseDir(module.filename) + '/lib', module.exports);
+```
+
+{{>main}}
