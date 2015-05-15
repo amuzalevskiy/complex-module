@@ -23,7 +23,7 @@ baseDir = module.exports.baseDir;
  * require('complex-module').make(module);
  * ```
  *
- * If your library is in subfolder:
+ * If your library is in subfolder (shorthand - [makeFromDirectory()](##makefromdirectorymoduleinfo-innerpath--object) fn):
  * ```javascript
  * var complexModule = require('complex-module');
  * complexModule.make(complexModule.baseDir(module.filename) + '/lib', module.exports);
@@ -41,6 +41,7 @@ module.exports.make = function (moduleInfoOrDir, res, filter) {
         directory = !moduleInfoOrDir.hasOwnProperty('filename') ? moduleInfoOrDir : baseDir(moduleInfoOrDir.filename),
         ignoreFolders = ['node_modules', 'test', /^\./];
 
+    // result usually equals module.exports (when moduleInfoOrDir is a module)
     if (!res) {
         if (moduleInfoOrDir.hasOwnProperty('exports')) {
             res = moduleInfoOrDir.exports;
@@ -49,6 +50,7 @@ module.exports.make = function (moduleInfoOrDir, res, filter) {
         }
     }
 
+    // if there is no filter add default one
     if (!filter) {
         fileCheckFn = moduleInfoOrDir.hasOwnProperty('filename') ?
             function (stats) {
@@ -100,4 +102,16 @@ module.exports.make = function (moduleInfoOrDir, res, filter) {
         });
 
     return res;
+}
+
+/**
+ * Shorthand for creating modules from sub directory
+ *
+ * @param moduleInfo {Object}
+ * @param innerPath {string}
+ * @returns {Object}
+ */
+
+module.exports.makeFromDirectory = function (moduleInfo, innerPath) {
+    return module.exports.make(baseDir(moduleInfo.filename) + '/' + innerPath, moduleInfo.exports)
 }
